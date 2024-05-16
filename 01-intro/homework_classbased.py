@@ -1,12 +1,13 @@
 from typing import List, Optional, Union
+
+import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
-import matplotlib.pyplot as plt
+from scipy.sparse import csr_matrix
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.linear_model import LinearRegression, Ridge
 from sklearn.metrics import mean_squared_error
 from sklearn.preprocessing import StandardScaler
-from scipy.sparse import csr_matrix
 
 
 class TaxiTripPredictor:
@@ -60,34 +61,31 @@ class TaxiTripPredictor:
         sns.histplot(y_pred, label="Prediction", color="blue", element="step", fill=True, stat="density")  # type: ignore
         plt.title("Comparison of Predictions and Actual Durations")
         plt.xlabel("Duration (minutes)")
-        plt.ylabel("Density")
+        plt.ylabel("%")
         plt.legend()
         plt.show()
 
 
-def main() -> None:
+if __name__ == "__main__":
     predictor = TaxiTripPredictor("../_data/green_tripdata_2024-01.parquet")
+
+    print("Experiment 1 (No Scaling, No Ridge):")
     predictor.load_and_preprocess_data(
         ["PULocationID", "DOLocationID"], ["trip_distance"], use_scaling=False
     )
     predictor.train_model(use_ridge=False)
-    print("Experiment 1 (No Scaling, No Ridge):")
     predictor.predict_and_evaluate()
 
+    print("Experiment 2 (With Scaling, With Ridge):")
     predictor.load_and_preprocess_data(
         ["PULocationID", "DOLocationID"], ["trip_distance"], use_scaling=True
     )
     predictor.train_model(use_ridge=True)
-    print("Experiment 2 (With Scaling, With Ridge):")
     predictor.predict_and_evaluate()
 
+    print("Experiment 3 (With Scaling, Without Ridge):")
     predictor.load_and_preprocess_data(
         ["PULocationID", "DOLocationID"], ["trip_distance"], use_scaling=True
     )
     predictor.train_model(use_ridge=False)
-    print("Experiment 2 (With Scaling, Without Ridge):")
     predictor.predict_and_evaluate()
-
-
-if __name__ == "__main__":
-    main()
